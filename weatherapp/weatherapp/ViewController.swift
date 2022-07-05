@@ -30,6 +30,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     let locationManager = CLLocationManager()
     var currentLocation: CLLocation?
     
+    var result: WeatherResponse?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
@@ -64,9 +66,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         print("\(lon) | \(lat)")
         
         let url = "https://api.openweathermap.org/data/2.5/weather?lat=\(lat)&lon=\(lon)&appid=a25168da5eb0e24e796fb52861b8a366"
-        
-        print("url path: \(url)")
-        
+                
         URLSession.shared.dataTask(with: URL(string: url)!, completionHandler: { data, response, error in
             
             // Validation
@@ -88,23 +88,24 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 return
             }
             
-            print("result: \(result.main.feelsLike)")
-            
+            self.result = result
+                        
             DispatchQueue.main.async {
-                self.tempLabel.text = String(format: "%.2f", (result.main.temp).kelvinToCelsius) + "° C"
-                self.placeLabel.text = result.name
-                self.feelsLikeLabel.text = String(format: "%.2f", (result.main.feelsLike).kelvinToCelsius) + "° C"
-                self.tempMinLabel.text = String(format: "%.2f", (result.main.tempMin).kelvinToCelsius) + "° C"
-                self.tempMaxLabel.text = String(format: "%.2f", (result.main.tempMax).kelvinToCelsius) + "° C"
-                self.pressureLabel.text = String(format: "%.2f", (result.main.pressure))
-                self.humidityLabel.text = String(format: "%.2f", (result.main.humidity))
+                self.updateViews()
             }
-            
         }).resume()
         
     }
     
-    
+    func updateViews()  {
+        self.tempLabel.text = String(format: "%.2f", (result?.main.temp)!.kelvinToCelsius) + "° C"
+        self.placeLabel.text = result?.name
+        self.feelsLikeLabel.text = String(format: "%.2f", (result?.main.feelsLike)!.kelvinToCelsius) + "° C"
+        self.tempMinLabel.text = String(format: "%.2f", (result?.main.tempMin)!.kelvinToCelsius) + "° C"
+        self.tempMaxLabel.text = String(format: "%.2f", (result?.main.tempMax)!.kelvinToCelsius) + "° C"
+        self.pressureLabel.text = String(format: "%.2f", (result?.main.pressure)!)
+        self.humidityLabel.text = String(format: "%.2f", (result?.main.humidity)!)
+    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return models.count
